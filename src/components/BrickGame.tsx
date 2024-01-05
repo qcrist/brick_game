@@ -138,6 +138,7 @@ export function BrickGameReactRenderer() {
 
     useEffect(() => {
         //TODO technically createRenderer COULD change...
+        //TODO would really need to zero out the renderer, as BrickGameCtx expects an empty renderer
         const ctx = new BrickGameCtx(createRenderer());
 
         return () => ctx.stop();
@@ -159,7 +160,6 @@ export function BrickGameReactRenderer() {
         if (!spriteRenderCache[key])
             spriteRenderCache[key] = <SpriteRender store={store} id={asRef(key)} key={key}/>
     }
-
 
     return <WrapperDiv>
         <TitleDiv>BrickGame!</TitleDiv>
