@@ -1,11 +1,18 @@
 import * as esbuild from 'esbuild'
 
+const production = process.argv[process.argv.length-1] === "production";
+
 const ctx = await esbuild.context({
-    sourcemap: "inline",
+    sourcemap: production ? undefined : "inline",
     entryPoints: ['src/index.tsx', 'src/main.css'],
     bundle: true,
-    outdir: 'dist'
+    outdir: 'dist',
+    minify: production
 })
 
-await ctx.watch();
+if (production) {
+    await ctx.rebuild();
+    await ctx.dispose();
+} else
+    await ctx.watch();
 

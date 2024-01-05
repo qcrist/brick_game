@@ -1,9 +1,1 @@
-/* src/main.css */
-body {
-  margin: 0;
-}
-#content_root {
-  height: 100vh;
-  width: 100vw;
-}
-/*# sourceMappingURL=data:application/json;base64,ewogICJ2ZXJzaW9uIjogMywKICAic291cmNlcyI6IFsiLi4vc3JjL21haW4uY3NzIl0sCiAgInNvdXJjZXNDb250ZW50IjogWyJib2R5e1xyXG4gICAgbWFyZ2luOiAwO1xyXG59XHJcblxyXG4jY29udGVudF9yb290e1xyXG4gICAgaGVpZ2h0OiAxMDB2aDtcclxuICAgIHdpZHRoOiAxMDB2dztcclxufSJdLAogICJtYXBwaW5ncyI6ICI7QUFBQTtBQUNJLFVBQVE7QUFDWjtBQUVBLENBQUM7QUFDRyxVQUFRO0FBQ1IsU0FBTztBQUNYOyIsCiAgIm5hbWVzIjogW10KfQo= */
+body{margin:0}#content_root{height:100vh;width:100vw}

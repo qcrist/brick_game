@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "pack": "node build.mjs"
+    "pack-development": "node build.mjs",
+    "pack-production": "node build.mjs production"
   },
   "dependencies": {
     "immer": "^10.0.3",
