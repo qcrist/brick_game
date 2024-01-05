@@ -18,8 +18,8 @@ type brick_transition = (keyof typeof brick_states) | typeof REMOVE;
 const brick_transitions: { [K in brick_type]: brick_transition } = {
     // WALL: "WALL",
     LEFT1: REMOVE,
-    LEFT2: "LEFT1",
-    LEFT3: "LEFT2"
+    LEFT2: REMOVE,//"LEFT1",
+    LEFT3: REMOVE,//"LEFT2"
 }
 
 function brickColor(type: brick_type) {
@@ -182,6 +182,7 @@ export class BrickGameCtx {
     readonly #renderer: RendererCtx;
     #stop: boolean = false;
     #game_over = false;
+    #paused = true;
 
     readonly #on_stop: (() => void)[] = [];
     readonly #bricks: SDict<Brick> = {};
@@ -224,8 +225,8 @@ export class BrickGameCtx {
 
         for (let x = 0; x < w; x += BRICK_WIDTH) {
             for (let y = 0; y < 10; y++) {
-                if (Math.random() > 0.8) continue;
-                const brick_id = "brick_" + (next_brick_id++);
+                const idx = next_brick_id++
+                const brick_id = "brick_" + idx;
                 const bounds: SpriteBounds = {
                     x,
                     y: y * BRICK_HEIGHT,
@@ -233,14 +234,18 @@ export class BrickGameCtx {
                     w: BRICK_WIDTH,
                     h: BRICK_HEIGHT
                 };
-                const brick_type: brick_type = "LEFT1";///types[(x / BRICK_WIDTH + y) % types.length];
+                let brick_type: brick_type = "LEFT1";
+                if (idx % 3 == 0)
+                    brick_type = "LEFT2";
+                if (idx % 3 == 1)
+                    brick_type = "LEFT3";
                 this.#addBrick(brick_id, brick_type, bounds);
             }
         }
 
         this.#game_ball = {
-            pos: {cx: 100, cy: 350, hw: BALL_SIZE / 2, hh: BALL_SIZE / 2},
-            vel: {x: 100, y: 100},
+            pos: {cx: w / 2, cy: BRICK_HEIGHT * 13, hw: BALL_SIZE / 2, hh: BALL_SIZE / 2},
+            vel: {x: 0, y: 100},
         }
 
         this.#ball_sprite_id = renderer.createSprite({
@@ -285,10 +290,14 @@ export class BrickGameCtx {
     }
 
     #ballHitBottom() {
+        this.#triggerGameOver("red");
+    }
+
+    #triggerGameOver(color: string) {
         this.#game_over = true;
         this.#renderer.updateSprite(this.#ball_sprite_id, obj => {
             if (obj.type !== "color") throw new Error("bad ball sprite type");
-            obj.c = "red";
+            obj.c = color;
         })
     }
 
@@ -316,6 +325,10 @@ export class BrickGameCtx {
             this.#renderer.deleteSprite(brick.sprite_id);
             delete this.#bricks[brick_id];
             delete this.#static_physics[brick_id];
+            if (Object.keys(this.#bricks).length == 0) {
+                this.#triggerGameOver("green");
+                alert("YOU WIN!");
+            }
         } else {
             brick.type = transition;
             this.#renderer.updateSprite(brick.sprite_id, obj => {
@@ -384,7 +397,6 @@ export class BrickGameCtx {
                 const dxm1 = 1 - dxm;
                 const base = vectorNorm(this.#game_ball.vel, BALL_SPEED);
                 const adj = {x: dxm * PADDLE_MAX_DX, y: -dxm1 * PADDLE_MAX_DX / 4};
-                console.log(adj);
                 this.#game_ball.vel = vectorNorm(vectorAdd(base, adj), BALL_SPEED);
                 this.#stepBall(dt * (1 - f));
                 return;
@@ -418,6 +430,8 @@ export class BrickGameCtx {
         while (!this.#stop && !this.#game_over) {
             await this.#awaitAnimationFrame();
 
+            if (this.#paused) continue;
+
             const now = Date.now();
             const dt = Math.min(MAX_STEP, (now - last_render) / 1000);
 
@@ -441,6 +455,17 @@ export class BrickGameCtx {
     #onMouseMove(e: MouseEvent) {
         const root = this.#renderer.rootElement();
         if (!root) return;
+
+        let target = e.target;
+        while (target instanceof HTMLElement && target != root && target != document.body)
+            target = target.parentElement;
+
+        if (target !== root) {
+            this.#paused = true;
+            return;
+        }
+
+        this.#paused = false;
 
         const {left} = root.getBoundingClientRect();
 

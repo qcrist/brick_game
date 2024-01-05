@@ -21,6 +21,25 @@ type RenderState = Immutable<{
 type StoreType = StoreApi<RenderState>;
 type SpriteRenderCache = { [key: string]: React.JSX.Element }
 
+const TitleDiv = styled.div`
+  font-size: 40px;
+  color: white;
+  grid-column-start: 2;
+  grid-row-start: 1;
+  text-align: center;
+  font-family: monospace;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`
+
+const InfoDiv = styled.div`
+  font-size: 20px;
+  color: white;
+  grid-column-start: 2;
+  grid-row-start: 3;
+  font-family: monospace;
+`
 
 const WrapperDiv = styled.div`
   display: grid;
@@ -143,9 +162,11 @@ export function BrickGameReactRenderer() {
 
 
     return <WrapperDiv>
+        <TitleDiv>BrickGame!</TitleDiv>
         <MainDiv ref={rootRef} $bounds={bounds}>
             {sprites.map(id => spriteRenderCache[id])}
         </MainDiv>
+        <InfoDiv>F5 to restart</InfoDiv>
     </WrapperDiv>
 }
 
